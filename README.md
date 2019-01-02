@@ -14,6 +14,11 @@ go verson >= 1.11
 
 # Usage
 
+- Import db structure and data
+
+使用*.sql文件导入数据结构和测试数据
+
+- Go compile
 ```go
 go build i4o.xyz/rx8lottery
 ```
