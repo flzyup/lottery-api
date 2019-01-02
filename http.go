@@ -1,10 +1,10 @@
 /**
- * Copyright © 2017-2018 Shanghai Lebai Robotic Co., Ltd. All rights reserved.
+ * Copyright © 2017-2018 Yonnie @ i4o.xyz . All rights reserved.
  *
  * FileName: main/http.go
  *
- * Author: Yonnie Lu
- * Email: zhangyong.lu@lebai.ltd
+ * Author: FLZYUP Lu
+ * Email: yonnie.lu.inc@gmail.com
  * Date: 2018-12-26 18:13
  * Description:
  * History:
@@ -16,6 +16,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"math"
 	"net/http"
@@ -27,6 +28,11 @@ type Response struct {
 	Data interface{} `json:"data"`
 }
 
+type AwardedList struct {
+	Award
+	Users []*User `json:"users"`
+}
+
 func routeApi(root *gin.Engine) *gin.RouterGroup {
 	api := root.Group("/api")
 
@@ -36,6 +42,12 @@ func routeApi(root *gin.Engine) *gin.RouterGroup {
 	getAwardUsers(api)
 
 	return api
+}
+
+func routeHtml(root *gin.Engine) {
+	root.Use(static.Serve("/", static.LocalFile("./dist", true)))
+	//root.StaticFS("/dashboard", gin.Dir("templates", true))
+	//root.StaticFS("/assets", gin.Dir("templates/assets", true))
 }
 
 // get, post, put, delete
@@ -63,19 +75,37 @@ func getAward(api *gin.RouterGroup) {
 func getAwardUsers(api *gin.RouterGroup) {
 	api.GET("/award/users", func(ctx *gin.Context) {
 		if result, err := queryAwardUsers(); err != nil {
-
 			jsonError(ctx, err)
 		} else {
-			jsonData(ctx, result)
+			ret := make([]*AwardedList, 0)
+
+			for i := 0; i < len(result); i++ {
+				au := result[i]
+
+				var al *AwardedList
+				for j := 0; j < len(ret); j++ {
+					if ret[j].Id == au.AwardId {
+						al = ret[j]
+						break
+					}
+				}
+
+				if al == nil {
+					al = &AwardedList{}
+					al.Id = au.AwardId
+					al.Name = au.AwardName
+
+					al.Users = make([]*User, 0)
+					ret = append(ret, al)
+				}
+
+				al.Users = append(al.Users, &User{Id: au.UserId, Name: au.UserName})
+			}
+
+			jsonData(ctx, ret)
 		}
 	})
 }
-
-const (
-	footPlanAwardId = 1
-	yuanxingUserId  = 1
-	renCiUserId     = 9
-)
 
 // Lottery
 func lottery(api *gin.RouterGroup) {
@@ -114,21 +144,10 @@ func lottery(api *gin.RouterGroup) {
 			switch stop {
 			case 1:
 				{ // 如果是停止抽奖
-					switch awardId {
-					case footPlanAwardId:
-						result = append(result, renCiUserId)
-						_, err = insertUserAward(renCiUserId, footPlanAwardId, award.BatchId)
-
-						if err != nil {
-							jsonError(ctx, err)
-							return
-						}
-					default:
-						users, err = lotteryUserEnd(award.CarModel, award.BatchId, limit)
-						if err != nil {
-							jsonError(ctx, err)
-							return
-						}
+					users, err = lotteryUserEnd(award.CarModel, award.BatchId, limit)
+					if err != nil {
+						jsonError(ctx, err)
+						return
 					}
 				}
 			default:

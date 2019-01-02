@@ -1,10 +1,10 @@
 /**
- * Copyright © 2017-2018 Shanghai Lebai Robotic Co., Ltd. All rights reserved.
+ * Copyright © 2017-2018 Yonnie @ i4o.xyz . All rights reserved.
  *
  * FileName: rx8_lottery_api/lottery.go
  *
- * Author: Yonnie Lu
- * Email: zhangyong.lu@lebai.ltd
+ * Author: FLZYUP Lu
+ * Email: yonnie.lu.inc@gmail.com
  * Date: 2018-12-26 17:35
  * Description:
  * History:
@@ -56,6 +56,7 @@ func main() {
 	}))
 
 	routeApi(ginHttpServer)
+	routeHtml(ginHttpServer)
 
 	db, err = sql.Open("mysql", conf.Mysql.Dsn)
 	if err != nil {

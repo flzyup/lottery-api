@@ -1,10 +1,10 @@
 /**
- * Copyright © 2017-2018 Shanghai Lebai Robotic Co., Ltd. All rights reserved.
+ * Copyright © 2017-2018 Yonnie @ i4o.xyz . All rights reserved.
  *
  * FileName: main/db.go
  *
- * Author: Yonnie Lu
- * Email: zhangyong.lu@lebai.ltd
+ * Author: FLZYUP Lu
+ * Email: yonnie.lu.inc@gmail.com
  * Date: 2018-12-26 17:52
  * Description:
  * History:
@@ -13,7 +13,9 @@
  */
 package main
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 type User struct {
 	Id       int    `json:"id"`
@@ -99,8 +101,9 @@ func lotteryUserEnd(carModel string, awardBatchId int, limit int) ([]*User, erro
 	if carModel != "" {
 		queryString = "SELECT id, name, car_model FROM lt_user" +
 			" WHERE	id NOT IN ( SELECT user_id FROM lt_user_award WHERE award_batch_id = ? )" +
-			" and car_model = ?" +
-			" ORDER BY RAND() LIMIT ?"
+			" and car_model = ?"
+		queryString += " ORDER BY RAND() LIMIT ?"
+
 	} else {
 		queryString = "SELECT id, name, car_model FROM lt_user" +
 			" WHERE	id NOT IN ( SELECT user_id FROM lt_user_award WHERE award_batch_id = ? )" +
