@@ -161,10 +161,6 @@ func lottery(api *gin.RouterGroup) {
 			}
 
 			for _, v := range users {
-				if stop == 1 && award.BatchId == 2 && v.Id == yuanxingUserId {
-					// 老大不要奖品，哈哈哈
-					continue
-				}
 				result = append(result, v.Id)
 				if stop == 1 {
 					log().Infof("lottery user awarded: %v", v)
