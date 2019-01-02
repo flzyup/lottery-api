@@ -25,3 +25,4 @@ go build i4o.xyz/rx8lottery
 
 # License
 Apache License 2.0
+
